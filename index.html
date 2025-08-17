@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Projectile Motion Simulator</title>
+</head>
+<body>
+
+<div style="font-family:Arial,sans-serif; width:100%; max-width:1100px; margin:auto;">
+
+  <h2 style="text-align:center;">Projectile Motion Simulator</h2>
+
+  <!-- Main White Container -->
+  <div style="display:flex; flex-direction:column; gap:15px; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.15); width:100%; box-sizing:border-box;">
+
+    <!-- Top Layout -->
+    <div style="display:flex; gap:15px; flex-wrap:wrap; align-items:flex-start;">
+
+      <!-- Required Inputs + Reset -->
+      <div style="display:flex; flex-direction:column; gap:4px; flex:0 0 200px;">
+
+        <div style="border:1px solid #ccc; border-radius:8px; padding:10px; background:#f7f7f7;">
+          <h3 style="margin-top:0; font-size:16px; color:#333;">Required Inputs</h3>
+          <label style="color:#555;">Velocity:</label><br>
+          <select id="velocity" style="width:100%; padding:4px; border-radius:4px; border:1px solid #aaa;">
+            <option>Select</option>
+            <option>6 m/s</option>
+            <option>8 m/s</option>
+            <option>10 m/s</option>
+            <option>12 m/s</option>
+            <option>14 m/s</option>
+          </select><br>
+          <label style="color:#555;">Angle:</label><br>
+          <select id="angle" style="width:100%; padding:4px; border-radius:4px; border:1px solid #aaa;">
+            <option>Select</option>
+            <option>15°</option>
+            <option>30°</option>
+            <option>45°</option>
+            <option>60°</option>
+            <option>75°</option>
+          </select><br><br>
+          <button id="simulateBtn" style="padding:10px 20px; font-size:16px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer; width:100%;">
+            Simulate
+          </button>
+        </div>
+
+        <button id="resetBtn" style="padding:10px 20px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer; width:80%; margin-left:20px; margin-top:10px;">
+          🗑️ Reset
+        </button>
+
+      </div>
+
+      <!-- Optional Inputs -->
+      <div style="border:1px solid #ccc; border-radius:8px; padding:10px; flex:1; background:#f7f7f7; display:flex; flex-direction:column; gap:10px;">
+        <h3 style="margin-top:0; font-size:16px; color:#333;">Optional Inputs</h3>
+
+        <!-- Curve Overlay -->
+        <div style="border:1px solid #ccc; border-radius:8px; padding:8px; background:#fafafa;">
+          <h4 style="margin-top:0; font-size:14px; color:#333;">Curve Overlay</h4>
+          <label style="color:#555; margin-right:15px;"><input type="checkbox" id="showTheo"> Theoretical Curve</label>
+          <label style="color:#555;"><input type="checkbox" id="showSys"> Systematic Curve</label>
+        </div>
+
+        <!-- Systematic & Random Error side by side -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <div style="border:1px solid #ccc; border-radius:8px; padding:8px; flex:1; background:#fafafa;">
+            <h4 style="margin-top:0; font-size:14px; color:#333;">Systematic Error</h4>
+            <label style="color:#555;">ΔV (%):</label>
+            <select id="sysVelocity" style="width:100%; padding:4px; border-radius:4px; border:1px solid #aaa;">
+              <option>0%</option>
+              <option>5%</option>
+              <option>10%</option>
+            </select><br>
+            <label style="color:#555;">Δθ (°):</label>
+            <select id="sysAngle" style="width:100%; padding:4px; border-radius:4px; border:1px solid #aaa;">
+              <option>0°</option>
+              <option>1°</option>
+              <option>2°</option>
+            </select>
+          </div>
+
+          <div style="border:1px solid #ccc; border-radius:8px; padding:8px; flex:1; background:#fafafa;">
+            <h4 style="margin-top:0; font-size:14px; color:#333;">Random Error</h4>
+            <label style="color:#555;"><input type="checkbox" id="randError"> Apply Random Error</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post Simulation + Graph Zoom -->
+      <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+
+        <div style="border:1px solid #ccc; border-radius:8px; padding:10px; background:#f7f7f7; display:flex; flex-direction:column; align-items:center; gap:8px; width:180px;">
+          <h3 style="margin-top:0; font-size:16px; color:#333;">Post Simulation</h3>
+          <button id="exportBtn" style="padding:8px 15px; background:#2196F3; color:white; border:none; border-radius:5px; cursor:pointer; width:100%;">Export</button>
+          <button id="copyBtn" style="padding:8px 15px; background:#03A9F4; color:white; border:none; border-radius:5px; cursor:pointer; width:100%;">Copy</button>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div style="border:1px solid #ccc; border-radius:8px; padding:10px; background:#f7f7f7; width:180px; text-align:center;">
+          <h3 style="margin-top:0; font-size:16px; color:#333;">Graph Zoom</h3>
+          <button id="zoomFull" style="padding:5px 10px; background:#ccc; border:none; border-radius:5px; cursor:pointer; margin:3px;">Full View</button>
+          <button id="zoomIn" style="padding:5px 10px; background:#ccc; border:none; border-radius:5px; cursor:pointer; margin:3px;">Zoom In</button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Graph -->
+    <div id="plotly-div" style="width:100%; height:600px; background:white; border:1px solid #ccc; border-radius:8px;"></div>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.19.2/package/dist/xlsx.full.min.js"></script>
+
+<script>
+const g = 9.81;
+const nPoints = 50;
+
+// Initialize traces
+let figData = [
+  {x:[], y:[], mode:"lines", name:"Theoretical", line:{color:"black"}, visible:true},
+  {x:[], y:[], mode:"lines", name:"Systematic Error", line:{color:"blue", dash:"dash"}, visible:false},
+  {x:[], y:[], mode:"markers", name:"Measured", marker:{color:"red", size:6}, visible:true}
+];
+
+let layout = {
+  title:"Projectile Motion Simulator",
+  xaxis:{title:"x position (m)", range:[0,25]},
+  yaxis:{title:"y position (m)", range:[0,15]},
+};
+
+Plotly.newPlot("plotly-div", figData, layout);
+
+// Trajectory function
+function trajectory(v0, angleDeg){
+  const angleRad = angleDeg * Math.PI / 180;
+  const tFlight = 2 * v0 * Math.sin(angleRad) / g;
+  const dt = tFlight/(nPoints-1);
+  let x=[], y=[];
+  for(let i=0;i<nPoints;i++){
+    let t=i*dt;
+    let xi = v0*Math.cos(angleRad)*t;
+    let yi = v0*Math.sin(angleRad)*t - 0.5*g*t*t;
+    if(yi<0) yi=0;
+    x.push(xi); y.push(yi);
+  }
+  return [x,y];
+}
+
+// Simulate data
+function simulateData(){
+  const vStr = document.getElementById("velocity").value;
+  const aStr = document.getElementById("angle").value;
+  if(!vStr || !aStr){ alert("Select velocity and angle"); return; }
+  const v = parseFloat(vStr); const a = parseFloat(aStr);
+  const sysV = parseFloat(document.getElementById("sysVelocity").value);
+  const sysA = parseFloat(document.getElementById("sysAngle").value);
+  const applyRandom = document.getElementById("randError").checked;
+  const showTheo = document.getElementById("showTheo").checked;
+  const showSys = document.getElementById("showSys").checked;
+
+  let sysVelocityApplied = (Math.random()*2 -1) * sysV;
+  let vSys = v*(1 + sysVelocityApplied/100);
+  let aSys = a + sysA;
+
+  let [xTheo,yTheo] = trajectory(v,a);
+  let [xSys,ySys] = trajectory(vSys,aSys);
+
+  let xMeasured=[], yMeasured=[];
+  for(let i=0;i<xSys.length;i++){
+    let xi=xSys[i], yi=ySys[i];
+    if(applyRandom){
+      xi += (Math.random()-0.5)*0.02*v;
+      yi += (Math.random()-0.5)*0.02*v;
+    }
+    if(xi<0) xi=0; if(yi<0) yi=0;
+    xMeasured.push(xi); yMeasured.push(yi);
+  }
+
+  figData[0].x=xTheo; figData[0].y=yTheo; figData[0].visible=showTheo;
+  figData[1].x=xSys; figData[1].y=ySys; figData[1].visible=showSys;
+  figData[2].x=[]; figData[2].y=[]; figData[2].visible=true;
+
+  Plotly.react("plotly-div", figData, layout);
+
+  const angleRad = a * Math.PI/180;
+  const tFlight = 2*v*Math.sin(angleRad)/g;
+  const interval = tFlight/nPoints*1000;
+  let i=0;
+  let timer = setInterval(()=>{
+    if(i>=xMeasured.length){ clearInterval(timer); }
+    else { Plotly.extendTraces("plotly-div",{x:[[xMeasured[i]]], y:[[yMeasured[i]]]},[2]); i++; }
+  }, interval);
+
+  let titleParts=[];
+  if(showTheo) titleParts.push("Theoretical");
+  if(sysV!==0 || sysA!==0) titleParts.push(`Systematic Error (ΔV: ${sysVelocityApplied.toFixed(2)}%, Δθ: ${sysA}°)`);
+  if(applyRandom) titleParts.push("Random Error");
+
+  Plotly.relayout("plotly-div",{title:`Projectile Motion (v₀=${v} m/s, θ=${a}°) - ${titleParts.join(", ")}`});
+}
+
+// Event listeners
+document.getElementById("simulateBtn").addEventListener("click", simulateData);
+
+document.getElementById("zoomFull").addEventListener("click", ()=>{
+  Plotly.relayout("plotly-div",{
+    xaxis:{range:[0,25], title:"x position (m)"},
+    yaxis:{range:[0,15], title:"y position (m)"}
+  });
+});
+
+document.getElementById("zoomIn").addEventListener("click", ()=>{
+  Plotly.relayout("plotly-div",{
+    xaxis:{range:[0,7], title:"x position (m)"},
+    yaxis:{range:[0,7], title:"y position (m)"}
+  });
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+    if(confirm("⚠️ Reset simulation? This will delete all data.")){
+        figData.forEach(trace => { trace.x=[]; trace.y=[]; });
+        figData[0].visible = document.querySelector('#showTheoretical')?.checked ?? true;
+        figData[1].visible = document.querySelector('#showSystematic')?.checked ?? false;
+        figData[2].visible = true;
+        Plotly.react("plotly-div", figData, layout);
+        Plotly.relayout("plotly-div",{title:"Projectile Motion Simulator"});
+    }
+});
+
+document.getElementById("showTheo").addEventListener("change",(e)=>{
+  Plotly.restyle("plotly-div",{visible:e.target.checked},[0]);
+});
+document.getElementById("showSys").addEventListener("change",(e)=>{
+  Plotly.restyle("plotly-div",{visible:e.target.checked},[1]);
+});
+
+document.getElementById("exportBtn").addEventListener("click", ()=>{
+  let nPoints=figData[2].x.length;
+  let data=[];
+  for(let i=0;i<nPoints;i++){
+    data.push({"Measured X": figData[2].x[i], "Measured Y": figData[2].y[i]});
+  }
+  let ws=XLSX.utils.json_to_sheet(data);
+  let wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Projectile Data");
+  XLSX.writeFile(wb,"projectile_data.xlsx");
+});
+
+document.getElementById("copyBtn").addEventListener("click", ()=>{
+  let nPoints=figData[2].x.length;
+  let text="Measured X\tMeasured Y\\n";
+  for(let i=0;i<nPoints;i++){
+    text += figData[2].x[i] + "\t" + figData[2].y[i] + "\\n";
+  }
+  navigator.clipboard.writeText(text).then(()=>{alert("Copied to clipboard");});
+});
+</script>
+
+</body>
+</html>

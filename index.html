@@ -254,9 +254,9 @@ document.getElementById("exportBtn").addEventListener("click", ()=>{
 
 document.getElementById("copyBtn").addEventListener("click", ()=>{
   let nPoints=figData[2].x.length;
-  let text="Measured X\tMeasured Y\n";
+  let text="Measured X\tMeasured Y\r\n";
   for(let i=0;i<nPoints;i++){
-    text += figData[2].x[i] + "\t" + figData[2].y[i] + "\n";
+    text += figData[2].x[i] + "\t" + figData[2].y[i] + "\r\n";
   }
   navigator.clipboard.writeText(text).then(()=>{alert("Copied to clipboard");});
 });
@@ -264,5 +264,6 @@ document.getElementById("copyBtn").addEventListener("click", ()=>{
 
 </body>
 </html>
+
 
 
